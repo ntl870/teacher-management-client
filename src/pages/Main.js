@@ -1,4 +1,4 @@
-import { Button, Calendar, Typography, Modal } from "antd";
+import { Button, Calendar, Typography, Modal, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import { getMySchedules } from "../api/schedule";
 import { useState, useEffect } from "react";
@@ -7,6 +7,7 @@ export const Main = () => {
   const navigate = useNavigate();
   const [schedules, setSchedules] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -14,9 +15,12 @@ export const Main = () => {
   };
 
   useEffect(() => {
-    getMySchedules().then(({ data }) => {
-      setSchedules(data.schedules);
-    });
+    setLoading(true);
+    getMySchedules()
+      .then(({ data }) => {
+        setSchedules(data.schedules);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const dateCellRender = (value) => {
@@ -38,6 +42,20 @@ export const Main = () => {
       </ul>
     );
   };
+
+  if (loading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <Spin size="large" />;
+      </div>
+    );
 
   return (
     <>
